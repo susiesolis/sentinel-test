@@ -1,0 +1,79 @@
+import "strings"
+import "types"
+
+sub_id_by_env_id = {
+    "PC": "PC",
+    "BF": "PC",
+    "ST": "PC",
+    "PQ": "PC",
+    "DV": "DV",
+    "QA": "DV",
+    "CR": "DV",
+    "QS": "DV",
+    "GT": "DV",
+    "LP": "LP",
+    "PD": "PD",
+    "CT": "CT",
+    "VD": "VD",
+    "TS": "TS",
+    "SB": "SB",
+    "DR": "DR",
+}
+
+sub_by_sub_id = {
+    "PC": "980eb41b-0095-4194-840e-12d100aa3b3c",
+    "DV": "3d66dc2c-7be9-474a-89fe-1a00b0511b0e",
+    "LP": "ac99e728-328b-4e62-a0ab-a24636c0efa6",
+    "PD": "9eeb7642-3647-4d17-ad25-1c20a8cd395b",
+    "CT": "b4a08614-f231-4fc4-9fa3-0438afe3c721",
+    "VD": "41cd0211-1191-4884-bbc3-cd7e6d2b47aa",
+    "TS": "06a4a6ce-38f1-4795-ae25-6b109abd340f",
+    "SB": "de0bd28d-9c37-4d30-b8d3-6da0b7bffe98",
+    "DR": "1285caf7-9286-43e0-b051-d16b6351c3d4",
+}
+
+cidr_by_sub_id = {
+    "PC": ["10.52", "10.152"],
+    "DV": ["10.54", "10.150", "10.151"],
+    "LP": ["10.56"],
+    "PD": ["10.55"],
+    "CT": ["10.58"],
+    "VD": [""],
+    "TS": [""],
+    "SB": ["10.59"],
+    "DR": [""],
+}
+
+is_prod_env = func(env) {
+    return (["PC", "PD"] contains sub_id_by_env_id[env])
+}
+
+is_non_prod_env = func(env) {
+    return (["DV", "LP"] contains sub_id_by_env_id[env])
+}
+
+validate_prefixes_for_env = func(prefixes, env) {
+    validated = true
+
+    if not (types.type_of(prefixes) is "list") {
+        prefixes = [prefixes]
+    }
+
+    for prefixes as p {
+        octets = strings.split(p, ".")
+        
+        if is_prod_env(env) {
+            valid_cidrs = cidr_by_sub_id["PC"] + cidr_by_sub_id["PD"]
+        } else if is_non_prod_env(env) {
+            valid_cidrs = cidr_by_sub_id["DV"] + cidr_by_sub_id["LP"]
+        } else {
+            valid_cidrs = cidr_by_sub_id[sub_id_by_env_id[env]]
+        }
+
+        if not (strings.join([octets[0], octets[1]], ".") in valid_cidrs) {
+            validated = false
+        }
+    }
+
+    return validated
+}

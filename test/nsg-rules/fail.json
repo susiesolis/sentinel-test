@@ -1,0 +1,17 @@
+{
+    "mock": {
+        "tfplan/v2": "../../testdata/mock-tfplan-v2-fail.sentinel",
+        "tfrun": "../../testdata/mock-tfrun.sentinel"
+    },
+    "modules": {
+        "common": {
+            "path": "../../modules/common.sentinel"
+        },
+        "tfplan-functions": {
+            "path": "../../modules/tfplan-functions.sentinel"
+        }
+    },
+    "test": {
+        "main": false
+    }
+}

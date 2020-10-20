@@ -1,0 +1,54 @@
+created_at = "2020-07-08T17:26:16.821Z"
+message = "Queued manually using Terraform"
+speculative = false
+is_destroy = false
+
+variables = {
+	"ARM_CLIENT_ID": {
+		"category":  "env",
+		"sensitive": false,
+	},
+	"ARM_CLIENT_SECRET": {
+		"category":  "env",
+		"sensitive": true,
+	},
+	"ARM_SUBSCRIPTION_ID": {
+		"category":  "env",
+		"sensitive": false,
+	},
+	"ARM_TENANT_ID": {
+		"category":  "env",
+		"sensitive": true,
+	},
+	"application_id": {
+		"category":  "terraform",
+		"sensitive": false,
+	},
+	"region_id": {
+		"category":  "terraform",
+		"sensitive": false,
+	},
+	"resource_group_name": {
+		"category":  "terraform",
+		"sensitive": false,
+	},
+}
+
+organization = {
+	"name": "hrblock",
+}
+
+workspace = {
+	"auto_apply":        false,
+	"created_at":        "2020-06-23T23:03:45.292Z",
+	"description":       null,
+	"name":              "UUU-A3-APP-QA",
+	"vcs_repo":          null,
+	"working_directory": "",
+}
+
+cost_estimate = {
+	"delta_monthly_cost":    "0.0",
+	"prior_monthly_cost":    "0.0",
+	"proposed_monthly_cost": "0.0",
+}
