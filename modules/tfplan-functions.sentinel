@@ -226,6 +226,8 @@ evaluate_attribute = func(r, attribute) {
   }
 }
 
+prtmsg = false
+
 ### print_violations ###
 # Prints violations returned by any of the filter functions defined below.
 # This would normally only be called if the filter function had been called
