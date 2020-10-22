@@ -5,55 +5,13 @@ import "tfrun"
 
 #####Functions#####
 
-validate_nsg_rules = func() {
-    validated = true
+print_stuff = func() {validated = true
+  print(tfrun.variables)
 
-    if (tfrun.workspace.name matches "[A-Z]{3}-A[0-9]-APP-[A-Z]{2}") {
-        allNSGs = tfplanfunctions.find_resources("azurerm_network_security_rule")
-
-        for allNSGs as _, r {
-            resourceGroupName = tfplanfunctions.evaluate_attribute(r, "resource_group_name")
-            print("resource_group_name =", resourceGroupName)
-            environment = resourceGroupName[2:4]
-            ruleName = tfplanfunctions.evaluate_attribute(r, "name")
-            print("rule =", ruleName)
-        
-            if common.is_prod_env(environment) {
-                validated = false
-                print("Custom NSG changes for production environments require SecOps review and approval.")
-                return validated
-            } else {
-                direction = tfplanfunctions.evaluate_attribute(r, "direction")
-
-                if direction is "Inbound" {
-                    cidrs = [tfplanfunctions.evaluate_attribute(r, "source_address_prefix")]
-                    if cidrs is [null] {
-                        cidrs = tfplanfunctions.evaluate_attribute(r, "source_address_prefixes")
-                    }
-                } else {
-                    cidrs = [tfplanfunctions.evaluate_attribute(r, "destination_address_prefix")]
-                    if cidrs is [null] {
-                        cidrs = tfplanfunctions.evaluate_attribute(r, "destination_address_prefixes")
-                    }
-                }
-                
-                if not common.validate_prefixes_for_env(cidrs, environment) {
-                    validated = false
-                    if direction is "Inbound" {
-                        print("NSG rule", "\"" + ruleName + "\"", "has a value for source_address_prefixes which requires SecOps review and approval.")
-                        print("source_address_prefix =", cidrs)
-                    } else {
-                        print("NSG rule", "\"" + ruleName + "\"", "has a value for destination_address_prefixes which requires SecOps review and approval.")
-                        print("destination_address_prefix =", cidrs)
-                    }
-                }
-            }
-        }
-    }
-
-    return validated
+return validated
 }
 
+
 main = rule {
-    validate_nsg_rules()
+  print_stuff()
 }
