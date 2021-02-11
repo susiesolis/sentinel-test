@@ -9,3 +9,9 @@ module "tfplan-functions" {
 policy "nsg-rules" {
   enforcement_level = "soft-mandatory"
 }
+
+  
+  
+  
+  
+  
