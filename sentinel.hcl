@@ -7,7 +7,7 @@ module "tfplan-functions" {
 }
 
 policy "nsg-rules" {
-  enforcement_level = "soft-mandatory"
+  enforcement_level = "hard-mandatory"
 }
 
   
