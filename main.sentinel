@@ -1,1 +1,62 @@
-main = rule { false }
+import "tfplan"
+import "strings"
+import "json"
+
+get_keys = func(type) {
+	if length(tfplan.module_paths else []) > 0 {
+		return get_resources_all_modules(type)
+	} else {
+		return true
+	}
+}
+
+get_resources_all_modules = func(type) {
+	resources = []
+	for tfplan.module_paths as path {
+		named_and_counted_resources = tfplan.module(path).resources[type] else {}
+		for named_and_counted_resources as _, keys {
+			for keys as _, body {
+				append(resources, body)
+			}
+		}
+	}
+	return resources
+}
+
+allowed_services = [
+	"ecr","backup","dms","ssm","ec2","elasticfilesystem","es","fsx","glue","kinesis","kinesisvideo","lambda","kafka","redshift","rds","secretsmanager","sns","s3","sqs","xray","documentdb","dynamodb","aurora", "athena", "eks","elasticache","emr","glacier","sagemaker","codebuild","cloudtrail","codedeploy","storagegateway",
+]
+
+
+kms_service_allowed = rule {
+    # search for keys to validate key rotation and key spec (we can validate every property)
+    all get_keys("aws_kms_key") as r {
+		validate_kms(r)
+    }
+}
+
+# Main rule that requires other rules to be true
+main = rule {
+	(kms_service_allowed) else true
+}
+
+validate_kms = func(r){
+
+	if r.destroy and not r.requires_new {
+      print("Skipping resource that is being destroyed.")
+      return true
+    }
+
+	# validate approved service
+	viaService = json.unmarshal(r.applied.policy).Statement[2].Condition.StringEquals["kms:ViaService"]
+	service_name = strings.split(viaService[0], ".")[0]
+
+	# validate key spec
+	key_spec = r.applied.customer_master_key_spec
+
+	if service_name in allowed_services and  key_spec == "SYMMETRIC_DEFAULT"{
+		return true
+	} else {
+		return false
+	}
+}
