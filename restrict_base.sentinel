@@ -1,0 +1,19 @@
+import "tfconfig" as tfconfig
+import "get_root" as get_root
+
+check_switch={}
+check_switch={"block": false}
+block_deployments = func(tmp_var) {
+    if check_switch["block"]{
+            check = false
+     }else {
+        check = true
+        }
+    return check
+}
+
+tmp_var=get_root.get_root_module()
+print(tmp_var)
+main = rule { block_deployments(tmp_var) }
+
+
